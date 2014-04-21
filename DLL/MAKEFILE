@@ -1,0 +1,104 @@
+
+# Librarian
+
+LIBRARIAN=lib /nologo
+
+# rm
+
+RM=del
+
+#cp
+
+CP=copy
+
+# Linker
+
+LINK=link386
+LFLAGS=/F /NOLOGO /NOI /NOE
+
+# C-Compiler
+
+#
+# Verwendete Compiler Optionen
+#   -Ge+    EXE Datei erstellen
+#   -Ge-    DLL Datei erstellen
+#   -Gd+    Alle Referenzen dynamisch auflîsen
+#   -Gt+    'Tiled Memory': Variablen auf 64KB Grenzen ausrichten (fÅr 16-Bit Code)
+#   -Gm+    Multithreaded Libraries verwenden
+#   -G4     Optimize for 486
+#   -Ss+    '//' Kommentare erlauben
+#   -Tx+    AusfÅhrlicher Dump bei Exceptions
+#   -Kp+    Warnungen fÅr nicht benutzte Funktionsparameter
+#   -Q+     Quiet Mode: Unnîtige Textausgaben unterdrÅcken
+#   -O+     Optimize
+
+CC=icc -c
+EXE_CFLAGS=$(DEFINE) -Ge+ -Gd+ -Gt+ -Gm+ -G4 -Ss+ -Tx+ -Q+
+DLL_CFLAGS=$(DEFINE) -Ge- -Gd+ -Gt+ -Gm+ -G4  -Ss+ -Tx+ -Q+
+EXE_CFLAGS32=$(DEFINE) -Ge+ -Gd+ -Gm+ -G4  -Ss+ -Tx+ -Q+
+DLL_CFLAGS32=$(DEFINE) -Ge- -Gd+ -Gm+ -G4  -Ss+ -Tx+ -Q+
+CFLAGS=$(EXE_CFLAGS) $(CFLAGS_EXTENSION)
+
+# Import Library Builder
+
+IMPLIB=implib
+IFLAGS=/NOLOGO
+
+# Default rules
+
+.SUFFIXES:
+.SUFFIXES: .c .cpp
+
+.c.obj:
+    $(CC) $(CFLAGS) $*.c
+
+.cpp.obj:
+    $(CC) $(CFLAGS) $*.cpp
+
+# DEBUG=-DDEBUG
+
+!IFDEF DEBUG
+CFLAGS_EXTENSION = -Ti+
+LFLAGS_EXTENSION = /DEBUG
+!ENDIF
+
+DEFINE=$(DEBUG)
+
+PEEKDLLOBJS=peek.obj
+PEEK_DLL=peek.dll
+
+PEEKTESTOBJS=peektest.obj
+PEEKTESTLIBS=peek.lib
+PEEKTEST_EXE=peektest.exe
+
+TARGETS=$(PEEKTEST_EXE) $(PEEK_DLL)
+
+all: $(TARGETS)
+
+peek.obj: peek.c peek.h ..\ioctls.h
+    $(CC) $(DLL_CFLAGS32) $(CFLAGS_EXTENSION) $*.c
+
+main.obj: main.cpp peek.h
+    $(CC) $(EXE_CFLAGS32) $(CFLAGS_EXTENSION) $*.cpp
+
+peek.lib: peek.def
+    $(IMPLIB) $(IFLAGS) $@ $*.def
+
+peek.dll: $(PEEKDLLOBJS)
+    $(LINK) $(LFLAGS) $(LFLAGS_EXTENSION) $(PEEKDLLOBJS),$@,$*.map,$(PEEKDLLLIBS),$*.def;
+
+peektest.exe: $(PEEKTESTOBJS)
+    $(LINK) $(LFLAGS) $(LFLAGS_EXTENSION) $(PEEKTESTOBJS),$@,$*.map,$(PEEKTESTLIBS),$*.def;
+
+#
+
+debug:
+    nmake /nologo /f makefile "DEBUG=-DDEBUG"
+
+clean:
+    -$(RM) *.lib
+    -$(RM) *.obj
+    -$(RM) *.dll
+    -$(RM) *.exe
+
+

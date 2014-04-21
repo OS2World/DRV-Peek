@@ -1,0 +1,12 @@
+LIBRARY PEEK INITINSTANCE TERMINSTANCE
+DATA MULTIPLE NONSHARED
+EXPORTS
+    PeekReadByte
+    PeekReadWord
+    PeekWriteByte
+    PeekWriteWord
+    PeekMapPhysicalAddress
+    PeekUnmapPhysicalAddress
+    PeekReboot
+
+
