@@ -1,0 +1,74 @@
+readme for peek!
+----------------
+
+What is peek?
+-------------
+
+peek is an OS/2 Physical Device Driver that allows its user to read/write from IO ports,
+map physical memory into the processes address space and to reboot programmatically.
+
+It works under OS/2 2.x or Warp.
+
+It is intended for all of us who sometimes need to interface to a bit of (possibly self-built) hardware 
+from OS/2, and don't want to write an OS/2 pdd for that purpose.
+
+It thus violates OS/2 protection mechanism on purpose and should be used with caution.
+
+How is it installed?
+--------------------
+
+add the line:
+
+DEVICE=x:\anypath\peek.sys
+
+to your config.sys and reboot.
+
+How can I use it?
+-----------------
+The interface of peek can be found in ioctls.h. For an example, look at peek.c, the code for an
+interface dll. Basically, open the driver (DosOpen("poke$", <tons of flags>)) and do DosDevIOCTls.
+The Category is 0x90 and the function codes range from IOCTL_INBYTE to IOCTL_REBOOT.
+For parameters, use the PEEKPARAMETER union. It should be obvious which variant to use.
+
+There is a dll called peek.dll which you can use instead of opening the driver and doing 
+DosDevIOCtls. A look at peek.h should give you the idea. It comes in source. 
+There is also a small test program in source.
+The dll can be compiled with the IBM C/Set++, if you want to use another compiler, you will at least
+have to modify the dll-initialization/termination. 
+The example should compile under any OS/2 32bit compiler.
+
+peek! does more or less exactly what is stated above with one noteable exception:
+
+peek! unmaps any mappings to physical memory on the process' death, so you don't have to worry
+about your page tables getting fu-bared over time when you forget to remove the mapping yourself
+(or are prevented from doing so by your process' sudden death).
+
+I am not really sure if it is necessary to undo the mapping - it is possible OS/2 would anyway do this
+for us, but I wanted to be on the save side. If you positively know it is not necessary, please let me
+know. My email address is below.
+
+To remember the mapping, the driver uses a fixed (64) sized table. Thus the maximum number of mappings is 64.
+If it is exceeded, PeekMapPhysicalAddress will return ERROR_OUT_OF_MAPPINGS (0x42).
+
+Warning!
+--------
+
+If it is not obvious to you that peek! allows you to crash your system seriously in no time at all, 
+don't use it! You have been warned!
+
+This software is under the GNU Public Library License. See the file COPYING.LIB.
+
+The general idea is that you can use peek, modify peek, redistribute peek
+(as long as you don't charge more than media costs) and generally do everything you want except
+removing the copyright license an blaming me if you totally screwed up your system using peek.
+
+Source code fo the driver is available upon request. You will need Watcom 10.5 to compile it.
+
+Enjoy,
+
+Lars Immisch
+lars@ibp.de
+
+Tel.: +49 (40) 432565-0
+Fax:  +49 (40) 432565-3
+

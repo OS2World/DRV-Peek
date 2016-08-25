@@ -1,0 +1,46 @@
+readme for peek! sources
+------------------------
+
+The peek sources come as a snapshot of my working directory.
+
+The files:
+----------
+
+clib.c and clib.h: 
+
+clib is a minimal library providing calls like strcpy and so forth. I could not use the Watcom c runtime 
+lib since this enforces the DOSSEG segment ordering which is incorrect in the case of an OS/2 driver.
+I also didn't want one more full c runtime lib wasting space.
+
+peek.c:
+
+strategy routine for peek.sys. The actual driver.
+
+start.asm:
+
+assembler startup wrapper dispatching calls coming from the kernel.
+
+devhlp.asm and drvlib.h:
+
+A Watcom optimized version of c-wrappers for some devhlp calls. 
+Refer to the Physical Device Driver Reference when in need of help. My prototypes differ from the ones
+found in dhcalls.h (on the IBM DDK) since they are older.
+
+build.exe:
+
+increments the build count in build.h
+
+Making:
+-------
+
+You'll need Watcom 10.5.
+
+There is an IDE projekt file: peek.wpj. Opening it with the Watcom IDE should get you started.
+
+If you don't want to use the IDE, type wmake -f peek.mk -h -e
+
+License: read COPYING.LIB
+
+
+Lars Immisch <lars@ibp.de>
+
