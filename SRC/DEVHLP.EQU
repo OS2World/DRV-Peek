@@ -1,0 +1,115 @@
+DevHlp_SchedClock       equ      0      ;  0    Called each timer tick
+DevHlp_DevDone          equ      1      ;  1    Device I/O complete
+DevHlp_Yield            equ      2      ;  2    yield CPU if resched set
+DevHlp_TCYield          equ      3      ;  3    yield to time critical task
+
+DevHlp_Block            equ      4      ;  4    Block on event
+DevHlp_Run              equ      5      ;  5    Unblock process
+
+DevHlp_SemRequest       equ      6      ;  6    claim a semaphore
+DevHlp_SemClear         equ      7      ;  7    release a semaphore
+DevHlp_SemHandle        equ      8      ;  8    obtain a semaphore handle
+
+DevHlp_PushRequest      equ      9      ;  9    Push the request
+DevHlp_PullRequest      equ     10      ;  A    Pull next request from Q
+DevHlp_PullParticular   equ     11      ;  B    Pull a specific request
+DevHlp_SortRequest      equ     12      ;  C    Push request in sorted order
+
+DevHlp_AllocReqPacket   equ     13      ;  D    allocate request packet
+DevHlp_FreeReqPacket    equ     14      ;  E    free request packet
+
+DevHlp_QueueInit        equ     15      ;  F    Init/Clear char queue
+DevHlp_QueueFlush       equ     16      ; 10    flush queue
+DevHlp_QueueWrite       equ     17      ; 11    Put a char in the queue
+DevHlp_QueueRead        equ     18      ; 12    Get a char from the queue
+
+DevHlp_Lock             equ     19      ; 13    Lock segment
+DevHlp_Unlock           equ     20      ; 14    Unlock segment
+
+DevHlp_PhysToVirt       equ     21      ; 15    convert physical address to virtual
+DevHlp_VirtToPhys       equ     22      ; 16    convert virtual address to physical
+DevHlp_PhysToUVirt      equ     23      ; 17    convert physical to LDT
+
+DevHlp_AllocPhys        equ     24      ; 18    allocate physical memory
+DevHlp_FreePhys         equ     25      ; 19    free physical memory
+
+DevHlp_SetROMVector     equ     26      ; 1A    set a ROM service routine vector
+DevHlp_SetIRQ           equ     27      ; 1B    set an IRQ interrupt
+DevHlp_UnSetIRQ         equ     28      ; 1C    unset an IRQ interrupt
+
+DevHlp_SetTimer         equ     29      ; 1D    set timer request handler
+DevHlp_ResetTimer       equ     30      ; 1E    unset timer request handler
+
+DevHlp_MonitorCreate    equ     31      ; 1F    create a monitor
+DevHlp_Register         equ     32      ; 20    install a monitor
+DevHlp_DeRegister       equ     33      ; 21    remove a monitor
+DevHlp_MonWrite         equ     34      ; 22    pass data records to monitor
+DevHlp_MonFlush         equ     35      ; 23    remove all data from stream
+
+DevHlp_GetDOSVar        equ     36      ; 24    Return pointer to DOS variable
+DevHlp_SendEvent        equ     37      ; 25    an event occurred
+DevHlp_ROMCritSection   equ     38      ; 26    ROM Critical Section
+DevHlp_VerifyAccess     equ     39      ; 27    Verify access to memory
+DevHlp_RAS              equ     40      ; 28    Put info in RAS trace buffer
+
+DevHlp_AttachDD         equ     42      ; 2A    Attach Device Driver
+DevHlp_InternalError    equ     43      ; 2B    die with an internal error message
+
+DevHlp_AllocGDTSelector equ     45      ; 2D    Allocate GDT Selectors
+DevHlp_PhysToGDTSelector equ    46      ; 2E    Convert phys addr to GDT sel
+DevHlp_RealToProt       equ     47      ; 2F    Change from real to protected mode
+DevHlp_ProtToReal       equ     48      ; 30    Change from protected to real mode
+
+DevHlp_EOI              equ     49      ; 31    Send EOI to PIC
+DevHlp_UnPhysToVirt     equ     50      ; 32    mark completion of PhysToVirt
+DevHlp_TickCount        equ     51      ; 33    modify timer
+
+DevHlp_GetLIDEntry      equ     52      ; 34    Obtain Logical ID
+DevHlp_FreeLIDEntry     equ     53      ; 35    Release Logical ID
+DevHlp_ABIOSCall        equ     54      ; 36    Call ABIOS
+DevHlp_ABIOSCommonEntry equ     55      ; 37    Invoke Common Entry Point
+DevHlp_GetDeviceBlock   equ     56      ; 38    Get ABIOS Device Block
+DevHlp_VMAlloc          equ     87      ; 57    Allocate/Map physical memory
+DevHlp_VMFree           equ     88      ; 58    free memory allocated by VMAlloc
+DevHlp_VirtToLin        equ     91      ; 5b
+
+DosVar_SysINFOSeg	equ	1	; get pointer to System Info Seg
+DosVar_LocINFOSeg	equ	2	; get pointer to Local Info Seg
+DosVar_ComPIDs  	equ	3	; owners of both com1 and com2
+DosVar_VectorS		equ	4	; Reserved
+DosVar_VectorReboot	equ	5	; Vector to reboot the DOS
+DosVar_VectorM		equ	6	; Reserved
+DosVar_YieldFlag	equ	7	; Indicator for performing Yields
+DosVar_TCYieldFlag	equ	8	; Indicator for performing TCYields
+
+
+event_SM_Mou            equ     0       ; event was Session Manager-mouse
+    event_MUF           equ     0       ; (OBSOLETE) event was muf key
+event_CtrlBrk           equ     1       ; event was Ctrl-Break
+event_CtrlC             equ     2       ; event was Ctrl-C
+event_CtrlScrLk         equ     3       ; event was Ctrl-ScrollLock
+event_CtrlPrtSc         equ     4       ; event was Ctrl-PrtSc
+event_ShftPrtSc         equ     5       ; event was Shift-PrtSc
+event_SM_Kbd            equ     6       ; event was Session Manager -keyboard
+event_count             equ     7       ; @@ Number of possible events
+
+;       Character Queue structure
+;
+;       QueueInit must be called before any other queue manipulation
+;       subroutine.  The Qsize field must be initialized before
+;       calling QueueInit.
+
+CharQueue STRUC
+        Qsize   DW      ?               ; Size of queue in bytes
+        Qchrout DW      ?               ; Index of next char out
+        Qcount  DW      ?               ; Count of characters in the queue
+        Qbase   DB      ?               ; Queue buffer
+CharQueue ENDS
+
+RASrouter struc
+        pretrace_addr   dw      0
+        preminor        dw      0
+        posttrace_addr  dw      0
+        postminor       dw      0
+RASrouter ends
+

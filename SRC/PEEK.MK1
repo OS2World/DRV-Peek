@@ -1,0 +1,40 @@
+!define BLANK ""
+d:\work\sources\peek\start.obj : d:\work\sources\peek\start.asm .AUTODEPEND
+ @d:
+ cd d:\work\sources\peek
+ *wasm start.asm -i=E:\WATCOM\h -ms -2 -d1 -w4 -e25 -zq -c
+
+d:\work\sources\peek\clib.obj : d:\work\sources\peek\clib.c .AUTODEPEND
+ @d:
+ cd d:\work\sources\peek
+ *wcc clib.c -i=E:\WATCOM\h -w4 -e25 -d_OS2_DRIVER_ -d_EC_ -zq -otexan -ol -&
+ol+ -oc -oi -hc -zl -zu -ms -4 -bt=os2
+
+d:\work\sources\peek\peek.obj : d:\work\sources\peek\peek.c .AUTODEPEND
+ @d:
+ cd d:\work\sources\peek
+ *wcc peek.c -i=E:\WATCOM\h -w4 -e25 -d_OS2_DRIVER_ -d_EC_ -zq -otexan -d2 -&
+hc -zl -zu -ms -4 -bt=os2
+
+d:\work\sources\peek\peek.dll : d:\work\sources\peek\start.obj d:\work\sourc&
+es\peek\clib.obj d:\work\sources\peek\peek.obj d:\work\sources\peek\clib.h d&
+:\work\sources\peek\drvlib.h d:\work\sources\peek\ioctls.h .AUTODEPEND
+ @d:
+ cd d:\work\sources\peek
+ build
+ wasm /3pr start.asm
+ wasm /3pr devhlp.asm
+ wlib devhlp.lib +-devhlp.obj
+ @%write peek.lk1 NAME peek
+ @%append peek.lk1 FIL start.obj,clib.obj,peek.obj
+ @%append peek.lk1 
+ *wlink SYS os2 dll op alignment=512 op protmode op st=0 op nod libr os2286.&
+lib,devhlp.lib op maxe=25 op q op symf op one @peek.lk1
+!ifneq BLANK ""
+ rc -i $[: -i E:\WATCOM\h -i E:\WATCOM\h\os2  peek.dll
+!endif
+ wlib -n -b peek.lib +peek.dll
+ exehdr /st:0 peek.dll
+ copy peek.dll peek.sys
+ 
+
